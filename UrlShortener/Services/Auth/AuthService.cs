@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using UrlShortener.Configuration;
 using UrlShortener.Data;
 using UrlShortener.DTOs;
+using UrlShortener.Exceptions;
 using UrlShortener.Models;
 using UrlShortener.Repositories;
 using UrlShortener.Services.PasswordHasher;
@@ -47,7 +48,7 @@ namespace UrlShortener.Services.Auth
 
             if (user == null || !_passwordHasher.VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt)) 
             {
-                throw new Exception("Неверный логин или пароль.");
+                throw new BadRequestException("Неверный логин или пароль.");
             }
 
             string token = CreateToken(user);

@@ -6,11 +6,14 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UrlShortener.Configuration;
 using UrlShortener.Data;
-using UrlShortener.Repositories;
 using UrlShortener.Services.Auth;
 using UrlShortener.Services.PasswordHasher;
 using Microsoft.OpenApi.Models;
 using UrlShortener.Middleware;
+using UrlShortener.Repositories.UnitOfWorkRep;
+using UrlShortener.Repositories.UserRep;
+using UrlShortener.Repositories.ShortUrlRep;
+using UrlShortener.Services.UrlShortening;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,8 +41,11 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasherService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IShortUrlRepository, ShortUrlRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUrlShorteningService, UrlShorteningService>();
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

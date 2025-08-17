@@ -8,7 +8,7 @@ using UrlShortener.Data;
 using UrlShortener.DTOs;
 using UrlShortener.Exceptions;
 using UrlShortener.Models;
-using UrlShortener.Repositories;
+using UrlShortener.Repositories.UnitOfWorkRep;
 using UrlShortener.Services.PasswordHasher;
 
 namespace UrlShortener.Services.Auth

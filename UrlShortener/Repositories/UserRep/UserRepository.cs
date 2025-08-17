@@ -2,7 +2,7 @@
 using UrlShortener.Data;
 using UrlShortener.Models;
 
-namespace UrlShortener.Repositories
+namespace UrlShortener.Repositories.UserRep
 {
     public class UserRepository : IUserRepository
     {

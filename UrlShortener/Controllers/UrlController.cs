@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using UrlShortener.DTOs;
 using UrlShortener.Models;
-using UrlShortener.Services.UrlShortening;
+using UrlShortener.Services.Url;
 
 namespace UrlShortener.Controllers
 {
@@ -11,11 +12,13 @@ namespace UrlShortener.Controllers
     [Route("api/[controller]")]
     public class UrlController : ControllerBase
     {
-        private readonly IUrlShorteningService _urlShorteningService;
+        private readonly IUrlService _urlService;
+        private readonly IMapper _mapper;
 
-        public UrlController(IUrlShorteningService urlShorteningService)
+        public UrlController(IUrlService urlShorteningService, IMapper mapper)
         {
-            _urlShorteningService = urlShorteningService;
+            _urlService = urlShorteningService;
+            _mapper = mapper;
         }
 
         [Authorize]
@@ -23,13 +26,34 @@ namespace UrlShortener.Controllers
         public async Task<IActionResult> CreateShortUrl(CreateShortUrlDto createUrlDto)
         {
             int userId = GetCurrentUserId();
-            ShortUrl newUrl = await _urlShorteningService.CreateShortUrlAsync(createUrlDto.OriginalUrl, userId);
+            ShortUrl newUrl = await _urlService.CreateShortUrlAsync(createUrlDto.OriginalUrl, userId);
 
             return Ok(new ShortUrlDto
             {
                 OriginalUrl = createUrlDto.OriginalUrl,
-                ShortUrl = newUrl.ShortCode,
+                ShortCode = newUrl.ShortCode,
             });
+        }
+
+        [HttpGet("my-urls"), Authorize]
+        public async Task<IActionResult> GetMyUrls()
+        {
+            var userId = GetCurrentUserId();
+            var urls = await _urlService.GetAllUrlsForUserAsync(userId);
+
+            var result = _mapper.Map<List<ShortUrlDto>>(urls);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("{shortCode}"), Authorize]
+        public async Task<IActionResult> DeleteUrl(string shortCode)
+        {
+            var userId = GetCurrentUserId();
+
+            await _urlService.DeleteUrlAsync(shortCode, userId);
+
+            return NoContent();
         }
 
         private int GetCurrentUserId()

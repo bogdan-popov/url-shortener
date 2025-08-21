@@ -3,6 +3,6 @@
     public class ShortUrlDto
     {
         public string OriginalUrl { get; set; }
-        public string ShortUrl { get; set; }
+        public string ShortCode { get; set; }
     }
 }

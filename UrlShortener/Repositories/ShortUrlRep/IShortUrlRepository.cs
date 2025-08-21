@@ -6,5 +6,7 @@ namespace UrlShortener.Repositories.ShortUrlRep
     {
         Task AddAsync(ShortUrl url);
         Task<ShortUrl?> FindByShortCodeAsync(string shortCode);
+        Task<List<ShortUrl>> GetAllByUserIdAsync(int userId);
+        void Delete(ShortUrl url);
     }
 }

@@ -14,7 +14,7 @@ using UrlShortener.Middleware;
 using UrlShortener.Repositories.UnitOfWorkRep;
 using UrlShortener.Repositories.UserRep;
 using UrlShortener.Repositories.ShortUrlRep;
-using UrlShortener.Services.UrlShortening;
+using UrlShortener.Services.Url;
 using UrlShortener.Services.Redirect;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +38,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddControllers();
 
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
@@ -46,7 +47,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IShortUrlRepository, ShortUrlRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUrlShorteningService, UrlShorteningService>();
+builder.Services.AddScoped<IUrlService, UrlService>();
 builder.Services.AddScoped<IUrlRedirectService, UrlRedirectService>();
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>

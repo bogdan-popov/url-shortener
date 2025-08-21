@@ -18,9 +18,19 @@ namespace UrlShortener.Repositories.ShortUrlRep
             await _context.ShortUrls.AddAsync(url);
         }
 
+        public void Delete(ShortUrl url)
+        {
+            _context.ShortUrls.Remove(url);
+        }
+
         public async Task<ShortUrl?> FindByShortCodeAsync(string shortCode)
         {
             return await _context.ShortUrls.FirstOrDefaultAsync(s => s.ShortCode == shortCode);
+        }
+
+        public Task<List<ShortUrl>> GetAllByUserIdAsync(int userId)
+        {
+            return _context.ShortUrls.Where(u => u.CreatedById == userId).ToListAsync();
         }
     }
 }

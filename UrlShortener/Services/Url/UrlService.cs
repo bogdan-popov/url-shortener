@@ -1,13 +1,14 @@
-﻿using UrlShortener.Models;
+﻿using UrlShortener.Exceptions;
+using UrlShortener.Models;
 using UrlShortener.Repositories.UnitOfWorkRep;
-using Microsoft.EntityFrameworkCore;
-namespace UrlShortener.Services.UrlShortening
+
+namespace UrlShortener.Services.Url
 {
-    public class UrlShorteningService : IUrlShorteningService
+    public class UrlService : IUrlService
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public UrlShorteningService(IUnitOfWork unitOfWork)
+        public UrlService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -15,8 +16,7 @@ namespace UrlShortener.Services.UrlShortening
         public async Task<ShortUrl> CreateShortUrlAsync(string originalUrl, int userId)
         {
             var user = await _unitOfWork.Users.FindByIdAsync(userId);
-            if (user == null)
-                throw new Exception("Пользователь не найден.");
+            if (user == null) throw new Exception("Пользователь не найден.");
 
             string newCode;
             ShortUrl? existingUrl;
@@ -40,6 +40,22 @@ namespace UrlShortener.Services.UrlShortening
             await _unitOfWork.CompleteAsync();
 
             return newShortUrl;
+        }
+
+        public async Task DeleteUrlAsync(string shortCode, int userId)
+        {
+            var urlToDelete = await _unitOfWork.ShortUrls.FindByShortCodeAsync(shortCode);
+
+            if (urlToDelete == null) throw new NotFoundException($"Ссылка с кодом '{shortCode}' не найдена.");
+            if (urlToDelete.CreatedById != userId) throw new Exception("У вас нет прав на удаление этой ссылки.");
+
+            _unitOfWork.ShortUrls.Delete(urlToDelete);
+            await _unitOfWork.CompleteAsync();
+        }
+
+        public Task<List<ShortUrl>> GetAllUrlsForUserAsync(int userId)
+        {
+            return _unitOfWork.ShortUrls.GetAllByUserIdAsync(userId);
         }
     }
 }

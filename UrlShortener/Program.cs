@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using StackExchange.Redis;
 using UrlShortener.Configuration;
 using UrlShortener.Data;
 using UrlShortener.Services.Auth;
@@ -14,6 +15,7 @@ using UrlShortener.Repositories.UnitOfWorkRep;
 using UrlShortener.Repositories.UserRep;
 using UrlShortener.Repositories.ShortUrlRep;
 using UrlShortener.Services.UrlShortening;
+using UrlShortener.Services.Redirect;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,7 +47,13 @@ builder.Services.AddScoped<IShortUrlRepository, ShortUrlRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUrlShorteningService, UrlShorteningService>();
+builder.Services.AddScoped<IUrlRedirectService, UrlRedirectService>();
 
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var configuration = ConfigurationOptions.Parse("localhost:6379", true);
+    return ConnectionMultiplexer.Connect(configuration);
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
